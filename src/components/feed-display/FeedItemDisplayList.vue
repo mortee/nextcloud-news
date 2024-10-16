@@ -1,6 +1,10 @@
 <template>
 	<div class="feed-item-display-list">
 		<div class="header">
+			<div class="header-content">
+				<slot name="header" />
+			</div>
+
 			<NcActions class="filter-container" :force-menu="true">
 				<template #icon>
 					<FilterIcon />
@@ -24,14 +28,24 @@
 					</template>
 				</NcActionButton>
 			</NcActions>
+			<button v-shortkey="['k']" class="hidden" @shortkey="jumpToPreviousItem">
+				Prev
+			</button>
+			<button v-shortkey="['j']" class="hidden" @shortkey="jumpToNextItem">
+				Next
+			</button>
 		</div>
 		<div class="feed-item-display-container">
-			<VirtualScroll :reached-end="reachedEnd"
+			<VirtualScroll ref="virtualScroll"
+				:reached-end="reachedEnd"
 				:fetch-key="fetchKey"
 				@load-more="fetchMore()">
 				<template v-if="items && items.length > 0">
 					<template v-for="item in filterSortedItems()">
-						<FeedItemRow :key="item.id" :item="item" />
+						<FeedItemRow :key="item.id"
+							:ref="'feedItemRow' + item.id"
+							:item="item"
+							:class="{ 'active': selectedItem && selectedItem.id === item.id }" />
 					</template>
 				</template>
 			</VirtualScroll>
@@ -40,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue, { type PropType } from 'vue'
 import _ from 'lodash'
 
 import FilterIcon from 'vue-material-design-icons/Filter.vue'
@@ -60,6 +74,11 @@ import { FeedItem } from '../../types/FeedItem'
 const DEFAULT_DISPLAY_LIST_CONFIG = {
 	starFilter: true,
 	unreadFilter: true,
+}
+
+export type Config = {
+	unreadFilter: boolean;
+	starFilter: boolean;
 }
 
 export default Vue.extend({
@@ -84,7 +103,7 @@ export default Vue.extend({
 			required: true,
 		},
 		config: {
-			type: Object,
+			type: Object as PropType<Config>,
 			default: () => {
 				return DEFAULT_DISPLAY_LIST_CONFIG
 			},
@@ -94,8 +113,8 @@ export default Vue.extend({
 		return {
 			mounted: false,
 
-			// no filter to start
-			filter: () => { return true as boolean },
+			// Show unread items at start
+			filter: () => { return this.unreadFilter },
 
 			// Always want to sort by date (most recent first)
 			sort: (a: FeedItem, b: FeedItem) => {
@@ -106,6 +125,7 @@ export default Vue.extend({
 				}
 			},
 			cache: [] as FeedItem[] | undefined,
+			selectedItem: undefined as FeedItem | undefined,
 		}
 	},
 	computed: {
@@ -115,11 +135,57 @@ export default Vue.extend({
 		cfg() {
 			return _.defaults({ ...this.config }, DEFAULT_DISPLAY_LIST_CONFIG)
 		},
+		getSelectedItem() {
+			return this.$store.getters.selected
+		},
+	},
+	watch: {
+		getSelectedItem(newVal) {
+			this.selectedItem = newVal
+		},
+	},
+	created() {
+		this.loadFilter()
 	},
 	mounted() {
 		this.mounted = true
 	},
 	methods: {
+		storeFilter() {
+			try {
+				let filterString = 'noFilter'
+
+				if (this.filter === this.starFilter) {
+					filterString = 'starFilter'
+				} else if (this.filter === this.unreadFilter) {
+					filterString = 'unreadFilter'
+				}
+
+				localStorage.setItem('news-filter', filterString)
+			} catch (error) {
+				console.error('Error saving filter to local storage:', error)
+			}
+		},
+		loadFilter() {
+			try {
+				const filterString = localStorage.getItem('news-filter')
+
+				if (filterString) {
+					switch (filterString) {
+					case 'starFilter':
+						this.filter = this.starFilter
+						break
+					case 'unreadFilter':
+						this.filter = this.unreadFilter
+						break
+					default:
+						this.filter = this.noFilter
+					}
+				}
+			} catch (error) {
+				console.error('Error loading filter from local storage:', error)
+			}
+		},
 		fetchMore() {
 			this.$emit('load-more')
 		},
@@ -132,7 +198,7 @@ export default Vue.extend({
 		unreadFilter(item: FeedItem): boolean {
 			return item.unread
 		},
-		toggleFilter(filter: () => boolean) {
+		toggleFilter(filter: (item: FeedItem) => boolean) {
 			if (this.filter === filter) {
 				this.filter = this.noFilter
 				if (filter === this.unreadFilter) {
@@ -141,6 +207,8 @@ export default Vue.extend({
 			} else {
 				this.filter = filter as () => boolean
 			}
+
+			this.storeFilter()
 		},
 		filterSortedItems(): FeedItem[] {
 			let response = [...this.items] as FeedItem[]
@@ -165,6 +233,50 @@ export default Vue.extend({
 			}
 
 			return response.sort(this.sort)
+		},
+		// Trigger the click event programmatically to benefit from the item handling inside the FeedItemRow component
+		clickItem(item: FeedItem) {
+			if (!item) {
+				return
+			}
+
+			const refName = 'feedItemRow' + item.id
+			const ref = this.$refs[refName]
+			// Make linter happy
+			const componentInstance = Array.isArray(ref) && ref.length && ref.length > 0 ? ref[0] : undefined
+			const element = componentInstance ? componentInstance.$el : undefined
+
+			if (element) {
+				element.click()
+				const virtualScroll = this.$refs.virtualScroll
+				virtualScroll.showElement(element)
+
+			}
+		},
+		currentIndex(items: FeedItem[]): number {
+			return this.selectedItem ? items.findIndex((item: FeedItem) => item.id === this.selectedItem.id) || 0 : -1
+		},
+		jumpToPreviousItem() {
+			const items = this.filterSortedItems()
+			let currentIndex = this.currentIndex(items)
+			// Prepare to jump to the first item, if none was selected
+			if (currentIndex === -1) {
+				currentIndex = 1
+			}
+			// Jump to the previous item
+			if (currentIndex > 0) {
+				const previousItem = items[currentIndex - 1]
+				this.clickItem(previousItem)
+			}
+		},
+		jumpToNextItem() {
+			const items = this.filterSortedItems()
+			const currentIndex = this.currentIndex(items)
+			// Jump to the first item, if none was selected, otherwise jump to the next item
+			if (currentIndex === -1 || (currentIndex < items.length - 1)) {
+				const nextItem = items[currentIndex + 1]
+				this.clickItem(nextItem)
+			}
 		},
 	},
 })
@@ -206,8 +318,15 @@ export default Vue.extend({
 	}
 
 	.header {
-		justify-content: right;
 		display: flex;
+		align-items: center;
+		justify-content: right;
+	}
+
+	.header-content {
+		flex-grow: 1;
+		padding-left: 50px;
+		font-weight: 700;
 	}
 
 	.filter-container {

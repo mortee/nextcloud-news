@@ -17,10 +17,8 @@ namespace OCA\News\Tests\Unit\Service;
 use FeedIo\Explorer;
 use FeedIo\Reader\ReadErrorException;
 
-use OC\L10N\L10N;
 use OCA\News\Db\FeedMapperV2;
 use OCA\News\Fetcher\FeedFetcher;
-use OCA\News\Service\Exceptions\ServiceConflictException;
 use OCA\News\Service\Exceptions\ServiceNotFoundException;
 use OCA\News\Service\FeedServiceV2;
 use OCA\News\Service\ItemServiceV2;
@@ -29,12 +27,9 @@ use OCP\AppFramework\Db\DoesNotExistException;
 
 use OCA\News\Db\Feed;
 use OCA\News\Db\Item;
-use OCP\IConfig;
-use OCP\IL10N;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-
 
 class FeedServiceTest extends TestCase
 {
@@ -73,11 +68,6 @@ class FeedServiceTest extends TestCase
     private $purifier;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|L10N
-     */
-    private $l10n;
-
-    /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private $logger;
@@ -86,6 +76,8 @@ class FeedServiceTest extends TestCase
      * @var \PHPUnit\Framework\MockObject\MockObject|Explorer
      */
     private $explorer;
+
+    private $response;
 
     protected function setUp(): void
     {
@@ -99,9 +91,7 @@ class FeedServiceTest extends TestCase
         $timeFactory->expects($this->any())
             ->method('getTime')
             ->will($this->returnValue($this->time));
-        $this->l10n = $this->getMockBuilder(IL10N::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+
         $this->mapper = $this
             ->getMockBuilder(FeedMapperV2::class)
             ->disableOriginalConstructor()
@@ -120,9 +110,6 @@ class FeedServiceTest extends TestCase
             ->getMock();
         $this->purifier = $this
             ->getMockBuilder(\HTMLPurifier::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $config = $this->getMockBuilder(IConfig::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -215,8 +202,13 @@ class FeedServiceTest extends TestCase
             );
 
         $feed = $this->class->create(
-            $this->uid, $url, $folderId,  false, null,
-            'user', 'pass'
+            $this->uid,
+            $url,
+            $folderId,
+            false,
+            null,
+            'user',
+            'pass'
         );
 
         $this->assertEquals($feed->getFolderId(), $folderId);
@@ -274,8 +266,13 @@ class FeedServiceTest extends TestCase
             );
 
         $feed = $this->class->create(
-            $this->uid, $url, $folderId,  false, 'title',
-            'user', 'pass'
+            $this->uid,
+            $url,
+            $folderId,
+            false,
+            'title',
+            'user',
+            'pass'
         );
 
         $this->assertEquals($feed->getFolderId(), $folderId);
@@ -337,8 +334,13 @@ class FeedServiceTest extends TestCase
             );
 
         $feed = $this->class->create(
-            $this->uid, $url, $folderId,  false, null,
-            'user', 'pass'
+            $this->uid,
+            $url,
+            $folderId,
+            false,
+            null,
+            'user',
+            'pass'
         );
 
         $this->assertEquals($feed->getFolderId(), $folderId);
@@ -445,7 +447,7 @@ class FeedServiceTest extends TestCase
 
         $feed->expects($this->once())
              ->method('getPreventUpdate')
-             ->will($this->returnValue(TRUE));
+             ->will($this->returnValue(true));
 
         $this->assertSame($feed, $this->class->fetch($feed));
     }
@@ -462,7 +464,7 @@ class FeedServiceTest extends TestCase
 
         $feed->expects($this->exactly(2))
              ->method('getPreventUpdate')
-             ->will($this->returnValue(TRUE));
+             ->will($this->returnValue(true));
 
         $this->class->fetchAll();
     }
@@ -475,7 +477,7 @@ class FeedServiceTest extends TestCase
 
         $feed->expects($this->once())
              ->method('getPreventUpdate')
-             ->will($this->returnValue(FALSE));
+             ->will($this->returnValue(false));
 
         $feed->expects($this->once())
              ->method('getLocation')
@@ -512,7 +514,7 @@ class FeedServiceTest extends TestCase
 
         $feed->expects($this->once())
              ->method('getPreventUpdate')
-             ->will($this->returnValue(FALSE));
+             ->will($this->returnValue(false));
 
         $feed->expects($this->once())
              ->method('getLocation')
@@ -536,7 +538,7 @@ class FeedServiceTest extends TestCase
 
         $feed->expects($this->once())
              ->method('getPreventUpdate')
-             ->will($this->returnValue(FALSE));
+             ->will($this->returnValue(false));
 
         $feed->expects($this->once())
              ->method('getLocation')
@@ -703,7 +705,7 @@ class FeedServiceTest extends TestCase
         $feed2 = Feed::fromRow(['id' => 3]);
         $this->mapper->expects($this->exactly(1))
             ->method('findFromUser')
-            ->with($this->uid,$feed->getId())
+            ->with($this->uid, $feed->getId())
             ->willReturnOnConsecutiveCalls($this->returnValue($feed));
 
         $feed2->setFullTextEnabled(false);
@@ -826,5 +828,4 @@ class FeedServiceTest extends TestCase
 
         $this->class->read($this->uid, 1);
     }
-
 }

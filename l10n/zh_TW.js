@@ -48,6 +48,8 @@ OC.L10N.register(
     "Interval in seconds in which the feeds will be updated." : "Feed 更新的時間間隔（以秒為單位）。",
     "No article selected" : "未選取文章",
     "Please select an article from the list..." : "請從清單中選取文章……",
+    "Move feed to folder" : "移動 feed 至資料夾",
+    "Move" : "移動",
     "User Name" : "使用者名稱",
     "Share" : "分享",
     "Share with" : "分享者",

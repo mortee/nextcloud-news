@@ -28,6 +28,7 @@ OC.L10N.register(
     "Feed fetcher timeout" : "עבר זמן מרבי להזנת ערוץ התוכן",
     "Explore Service URL" : "חקירת נתיב שירות",
     "Use system cron for updates" : "שימוש ב־cron של המערכת לעדכונים",
+    "Move" : "העברה",
     "Share" : "שתף",
     "Mark read" : "סימון כנקרא",
     "All articles" : "כל המאמרים",
@@ -110,4 +111,4 @@ OC.L10N.register(
     "Documentation" : "תיעוד",
     "Report a bug" : "דיווח על באג"
 },
-"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;");
+"nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

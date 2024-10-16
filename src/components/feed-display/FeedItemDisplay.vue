@@ -12,7 +12,12 @@
 				</NcActionButton>
 			</NcActions>
 			<StarIcon :class="{'starred': item.starred }" @click="toggleStarred(item)" />
+			<EyeIcon v-if="item.unread" @click="toggleRead(item)" />
+			<EyeCheckIcon v-if="!item.unread" @click="toggleRead(item)" />
 			<CloseIcon @click="clearSelected()" />
+			<button v-shortkey="{s: ['s'], l: ['l'], i: ['i']}" class="hidden" @shortkey="toggleStarred(item)" />
+			<button v-shortkey="['o']" class="hidden" @shortkey="openUrl(item)" />
+			<button v-shortkey="['u']" class="hidden" @shortkey="toggleRead(item)" />
 		</div>
 		<div class="article">
 			<div class="heading">
@@ -34,8 +39,7 @@
 					{{ t('news', 'by') }} {{ item.author }}
 				</span>
 				<span v-if="!item.sharedBy" class="source">{{ t('news', 'from') }}
-					<!-- TODO: Fix link to feed -->
-					<a :href="`#/items/feeds/${item.feedId}/`">
+					<a :href="`#/feed/${item.feedId}/`">
 						{{ getFeed(item.feedId).title }}
 						<img v-if="getFeed(item.feedId).faviconLink"
 							:src="getFeed(item.feedId).faviconLink"
@@ -110,10 +114,14 @@ import ShareItem from '../ShareItem.vue'
 import { Feed } from '../../types/Feed'
 import { FeedItem } from '../../types/FeedItem'
 import { ACTIONS, MUTATIONS } from '../../store'
+import EyeIcon from 'vue-material-design-icons/Eye.vue'
+import EyeCheckIcon from 'vue-material-design-icons/EyeCheck.vue'
 
 export default Vue.extend({
 	name: 'FeedItemDisplay',
 	components: {
+		EyeCheckIcon,
+		EyeIcon,
 		CloseIcon,
 		StarIcon,
 		ShareVariant,
@@ -171,6 +179,21 @@ export default Vue.extend({
 			this.$store.dispatch(item.starred ? ACTIONS.UNSTAR_ITEM : ACTIONS.STAR_ITEM, { item })
 		},
 
+		toggleRead(item: FeedItem): void {
+			if (item.unread) {
+				this.$store.dispatch(ACTIONS.MARK_READ, { item })
+			} else {
+				this.$store.dispatch(ACTIONS.MARK_UNREAD, { item })
+			}
+		},
+
+		openUrl(item: FeedItem): void {
+			// Open the item url in a new tab
+			if (item.url) {
+				window.open(item.url, '_blank')
+			}
+		},
+
 		closeShareMenu() {
 			this.showShareMenu = false
 		},
@@ -200,7 +223,6 @@ export default Vue.extend({
 
 <style>
 	.feed-item-display {
-		max-height: 100%;
 		overflow-y: hidden;
 		display: flex;
 		flex-direction: column;
@@ -208,7 +230,6 @@ export default Vue.extend({
 
 	.article {
 		padding: 0 50px 50px 50px;
-		overflow-y: scroll;
 		height: 100%;
 		max-width: 1024px;
 		margin-left: auto;

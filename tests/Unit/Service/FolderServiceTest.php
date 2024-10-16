@@ -28,7 +28,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-
 class FolderServiceTest extends TestCase
 {
 
@@ -90,7 +89,7 @@ class FolderServiceTest extends TestCase
         $this->logger = $this->getMockBuilder(LoggerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->class = new FolderServiceV2($this->mapper, $this->feedService, $timeFactory, $this->logger);
+        $this->class = new FolderServiceV2($this->mapper, $this->logger, $this->feedService, $timeFactory);
     }
 
     public function testFindAll()
@@ -287,5 +286,4 @@ class FolderServiceTest extends TestCase
 
         $this->class->read('jack', 1);
     }
-
 }

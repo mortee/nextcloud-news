@@ -2,15 +2,64 @@
 All notable changes to this project will be documented in this file.
 The format is mostly based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), older entries don't fully match.
 
+You can also check [on GitHub](https://github.com/nextcloud/news/releases), the release notes there are generated automatically and include every pull request.
+
 # Unreleased
 ## [25.x.x]
 ### Changed
-- make occ news:updater:job exit with code 2 if last update was too long ago
 
 ### Fixed
 
+# Releases
+## [25.0.0-alpha10] - 2024-10-14
+### Changed
+- Require NC 29 or 30, dropped support for NC 28
+- Require PHP 8.2 or higher
+### Fixed
+- Scroll position is not reset when switching between articles & feeds (#2548)
+- Unread counter does not count down when folders or feeds are marked read (#2800)
+- Query fetching status didn't work (#2800)
+- Keyboard shortcuts are active even when searching (#2738)
+
+## [25.0.0-alpha9] - 2024-10-03
+### Fixed
+- Use updated user agent when fetching feeds and favicons (#2788)
+- Allow feed title to be null in DB. (#2745)
+- Store HTTP last modified date from response header (#2724)
+- Admin settings could not be saved (#2533)
+
+## [25.0.0-alpha8] - 2024-07-07
+### Changed
+- Add support for moving feeds to another folder from the sidebar feed menu (#2707)
+- Persist the filter state and show unread items by default (#2704)
+
+### Fixed
+- Fix undefined item when using `j` and `k` keyboards shortcuts in an empty feed (#2689)
+
+## [25.0.0-alpha7] - 2024-06-10
+### Changed
+- added alternative development environment (#2670)
+- Implement `j` and `k` keyboards shortcuts for navigating through feed items (#2671)
+- Implement `s`, `i` and `l` keyboards shortcuts for staring current feed item (#2677)
+- Implement `o` keyboards shortcut for opening the URL of current feed item (#2677)
+- Implement `u` keyboards shortcut for marking current feed item read/unread (#2677)
+- Implement highlighting of active feed item (#2677)
 
 # Releases
+## [25.0.0-alpha6] - 2024-05-07
+### Changed
+- Improve layout of feed item row (#2569)
+
+### Fixed
+- Reset content scroll position when feed item is changed (#2569)
+- Fix link to feed in article header (#2569)
+
+## [25.0.0-alpha5] - 2024-04-01
+### Changed
+- make occ news:updater:job exit with code 2 if last update was too long ago (#2590)
+- Fix deprecated variable reference in ExportController.php (#2602)
+- Add support for Nextcloud 29 (#2611)
+
 ## [25.0.0-alpha4] - 2023-01-25
 ### Changed
 - Add DB index for news_feeds.deleted_at (#2526)
@@ -637,7 +686,7 @@ You can now delete unread items via occ:
 
 ### Fixed
 
-- Fix false cron notifaction #823
+- Fix false cron notification #823
 - Fix cron updater not working #819 #824
 - Fix invalid UserId when logged out #822
 - Fix autoPurge not working #824
@@ -684,7 +733,7 @@ You can now delete unread items via occ:
 ### Changed
 - JS library updates #737 #741
 - Allow data URI scheme inside the body of an item #733
-- Update to new BackgroudJob logic #704
+- Update to new BackgroundJob logic #704
 - Update feed-io to v4.7.8
 
 ### Fixed
@@ -846,7 +895,7 @@ You can now delete unread items via occ:
 
 ### Fixed
 - Highlight in compact mode #109
-- Prevent raw angluar templates from flashing on page load #429
+- Prevent raw angular templates from flashing on page load #429
 - HTML elements where not rendered #428
 - Provide UserAgent to prevent HTTP 403 errors #428
 

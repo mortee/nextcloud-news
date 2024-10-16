@@ -155,6 +155,9 @@ class FeedFetcherTest extends TestCase
     private $modified;
     private $location;
 
+    private $categories;
+    private $categoriesJson;
+
     protected function setUp(): void
     {
         $this->l10n = $this->getMockBuilder(IL10N::class)
@@ -347,7 +350,7 @@ class FeedFetcherTest extends TestCase
             false,
             'account@email.com',
             'F9sEU*Rt%:KFK8HMHT&',
-            $this->modified->format(DateTime::RSS)
+            null
         );
 
         $this->assertEquals([$feed, [$item]], $result);
@@ -697,9 +700,6 @@ class FeedFetcherTest extends TestCase
         $this->feed_mock->expects($this->exactly(1))
             ->method('getLink')
             ->will($this->returnValue($this->feed_link));
-        $this->feed_mock->expects($this->exactly(2))
-            ->method('getLastModified')
-            ->will($this->returnValue($this->modified));
         $this->feed_mock->expects($this->exactly(1))
             ->method('getLanguage')
             ->will($this->returnValue($lang));
@@ -710,7 +710,6 @@ class FeedFetcherTest extends TestCase
         $feed->setLink($this->feed_link);
         $feed->setLocation($this->location);
         $feed->setUrl($url);
-        $feed->setHttpLastModified((new DateTime('@3'))->format(DateTime::RSS));
         $feed->setAdded($this->time);
 
         $feed->setFaviconLink('http://anon.google.com');

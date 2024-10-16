@@ -11,31 +11,22 @@
 
 namespace OCA\News\Tests\Unit\Service;
 
-use FeedIo\Explorer;
-use FeedIo\Reader\ReadErrorException;
-
-use OC\L10N\L10N;
-use OCA\News\Service\Exceptions\ServiceConflictException;
 use OCA\News\Service\Exceptions\ServiceNotFoundException;
-use OCP\AppFramework\Db\DoesNotExistException;
 use OCA\News\Service\FeedServiceV2;
 use OCA\News\Service\ItemServiceV2;
 use OCA\News\Service\ShareService;
-use OCA\News\Utility\Time;
 
 use OCA\News\Db\Feed;
 use OCA\News\Db\Item;
 
 use OCP\IURLGenerator;
 use OCP\IUserManager;
-use OCP\IConfig;
 use OCP\IL10N;
 use OCP\IUser;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-
 
 class ShareServiceTest extends TestCase
 {
@@ -76,6 +67,11 @@ class ShareServiceTest extends TestCase
      * @var string
      */
     private $uid;
+
+    /**
+     * @var string
+     */
+    private $time;
 
     /**
      * @var string

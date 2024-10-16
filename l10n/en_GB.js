@@ -48,6 +48,8 @@ OC.L10N.register(
     "Interval in seconds in which the feeds will be updated." : "Interval in seconds in which the feeds will be updated.",
     "No article selected" : "No article selected",
     "Please select an article from the list..." : "Please select an article from the list...",
+    "Move feed to folder" : "Move feed to folder",
+    "Move" : "Move",
     "User Name" : "User Name",
     "Share" : "Share",
     "Share with" : "Share with",

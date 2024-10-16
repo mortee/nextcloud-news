@@ -48,6 +48,7 @@ OC.L10N.register(
     "Interval in seconds in which the feeds will be updated." : "Intervalo en segundos en el que se actualizarán las fuentes.",
     "No article selected" : "Ningún artículo seleccionado",
     "Please select an article from the list..." : "Por favor, selecciona un artículo de la lista...",
+    "Move" : "Mover",
     "User Name" : "Nombre de usuario",
     "Share" : "Compartir",
     "Share with" : "Compartir con",

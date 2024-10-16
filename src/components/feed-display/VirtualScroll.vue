@@ -10,7 +10,7 @@ import ItemSkeleton from './ItemSkeleton.vue'
 
 const GRID_ITEM_HEIGHT = 200 + 10
 // const GRID_ITEM_WIDTH = 250 + 10
-const LIST_ITEM_HEIGHT = 45 + 1
+const LIST_ITEM_HEIGHT = 110 + 1
 
 export default Vue.extend({
 	name: 'VirtualScroll',
@@ -31,19 +31,20 @@ export default Vue.extend({
 			scrollHeight: 500,
 			initialLoadingSkeleton: false,
 			initialLoadingTimeout: null,
+			elementToShow: null,
 		}
 	},
 	computed: {
-		fetching() {
-			return this.$store.state.items.fetchingItems[this.key]
+		fetching: {
+			cache: false,
+			get() {
+				return this.$store.state.items.fetchingItems[this.fetchKey]
+			},
 		},
 	},
 	watch: {
-		newBookmark() {
-			this.$el.scrollTop = 0
-		},
-		newFolder() {
-			this.$el.scrollTop = 0
+		fetchKey() {
+			this.scrollTop = 0
 		},
 	},
 	mounted() {
@@ -57,6 +58,9 @@ export default Vue.extend({
 		onScroll() {
 			this.scrollTop = this.$el.scrollTop
 			this.scrollHeight = this.$el.scrollHeight
+		},
+		showElement(element) {
+			this.elementToShow = element
 		},
 	},
 	render(h) {
@@ -106,7 +110,12 @@ export default Vue.extend({
 
 		const scrollTop = this.scrollTop
 		this.$nextTick(() => {
-			this.$el.scrollTop = scrollTop
+			if (this.elementToShow) {
+				this.elementToShow.scrollIntoView({ behavior: 'auto', block: 'nearest' })
+				this.elementToShow = null
+			} else {
+				this.$el.scrollTop = scrollTop
+			}
 		})
 
 		return h('div', {

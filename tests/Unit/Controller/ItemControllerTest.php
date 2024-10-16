@@ -30,7 +30,6 @@ use OCP\IUser;
 use OCP\IUserSession;
 use PHPUnit\Framework\TestCase;
 
-
 class ItemControllerTest extends TestCase
 {
 
@@ -455,6 +454,13 @@ class ItemControllerTest extends TestCase
 
     public function testGetItemsNoNewestItemsId()
     {
+        $result = [
+            'items' => [],
+            'feeds' => [],
+            'newestItemId' => null,
+            'starred' => 0
+        ];
+
         $this->itemsApiExpects(2, ListType::FEED);
 
         $this->itemService->expects($this->once())
@@ -463,7 +469,7 @@ class ItemControllerTest extends TestCase
             ->will($this->throwException(new ServiceNotFoundException('')));
 
         $response = $this->controller->index(ListType::FEED, 2, 3);
-        $this->assertEquals([], $response);
+        $this->assertEquals($result, $response);
     }
 
 
@@ -617,6 +623,4 @@ class ItemControllerTest extends TestCase
         $response = $this->controller->newItems(ListType::FEED, 2, 3);
         $this->assertEquals([], $response);
     }
-
-
 }

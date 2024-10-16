@@ -48,6 +48,8 @@ OC.L10N.register(
     "Interval in seconds in which the feeds will be updated." : "Saniye cinsinden, akışların güncellenme sıklığı.",
     "No article selected" : "Herhangi bir yazı seçilmemiş",
     "Please select an article from the list..." : "Lütfen listeden bir yazı seçin...",
+    "Move feed to folder" : "Akışı klasöre taşı",
+    "Move" : "Taşı",
     "User Name" : "Kullanıcı adı",
     "Share" : "Paylaş",
     "Share with" : "Şunlarla paylaş",
